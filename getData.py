@@ -278,6 +278,23 @@ def get_confederation(data,all_country_url,ip_list):
     return data
 
 
+# 
+# res: response of the profil page of a certain player
+# e.g. 
+#   url = "https://www.transfermarkt.com/david-de-gea/profil/spieler/59377"
+#   res = requests.get(url, headers=get_headers(), proxies=get_random_ip(ip_list))
+#   history_value = get_player_history_value(res)
+# 
+# returns: a list of tuples of ((time) time, (number) market value at that time)
+# 
+def get_player_history_value(res):
+    content = res.content.decode("unicode-escape")
+    series = re.search(r'(?<=\'series\':)\[.*\]', content).group(0).replace("\'", "\"")
+    raw = json.loads(series)[0]['data']
+    # print(raw[0])
+    data = list(map(lambda x: tuple([time.strptime(x['datum_mw'], "%b %d, %Y"), x['y']]) ,raw))
+    return data
+
 url = 'http://www.xicidaili.com/nn/'
 ip_list = get_ip_list(url, headers=get_headers())
 
